@@ -56,11 +56,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*debian.org*
 
-ADD unbound.conf /opt/unbound/etc/unbound/unbound.conf
-
-#"libssl-dev libexpat1-dev","ca-certificates"
+#ADD unbound.conf /opt/unbound/etc/unbound/unbound.conf
 
 ENV PATH=/opt/unbound/sbin:"$PATH"
 
-#CMD ["python3", "-m", "http.server"]
 CMD ["unbound", "-d", "-vvvvvv"]
