@@ -7,6 +7,7 @@ on:
     # At 5:30am on the 2nd, 15th, and 29th of every month
     - cron: '30 5 2,15,29 * *'
 
+  # Allows manual workflow runs through github.com
   workflow_dispatch:
 
 
@@ -21,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # Required to cross-compile
       - name: Set up QEMU
         run: |
           sudo apt-get update
