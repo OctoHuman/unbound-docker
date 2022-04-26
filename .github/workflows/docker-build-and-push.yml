@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: List diagnostics
+        run: docker buildx ls
+
       - name: Build image
         run: docker build . --tag unbound:latest --no-cache --platform=linux/arm64/v8
 
