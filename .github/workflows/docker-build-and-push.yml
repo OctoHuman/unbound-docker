@@ -1,0 +1,36 @@
+name: Docker Build and Push
+
+permissions: {}
+
+on:
+  schedule:
+    # At 5:30am on the 2nd, 15th, and 29th of every month
+    - cron: '30 5 2,15,29 * *'
+
+  workflow_dispatch:
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build image
+        run: docker build . --tag unbound:latest --no-cache
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u OctoHuman --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/octohuman/unbound:latest
+          docker tag unbound:latest $IMAGE_ID
+          docker push $IMAGE_ID
+
+      - name: Log out of registry
+        run: docker logout ghcr.io
