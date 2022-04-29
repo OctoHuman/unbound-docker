@@ -32,21 +32,23 @@ jobs:
         run: docker buildx ls
 
       - name: Build 386 image
-        run: docker build . --tag ghcr.io/octohuman/unbound-386:latest --no-cache --platform=linux/386
+        run: docker build . --tag ghcr.io/octohuman/unbound:386 --no-cache --platform=linux/386
 
       - name: Build AMD64 image
-        run: docker build . --tag ghcr.io/octohuman/unbound-amd64:latest --no-cache
+        run: docker build . --tag ghcr.io/octohuman/unbound:amd64 --no-cache
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u OctoHuman --password-stdin
 
       - name: Push images
         run: |
-          docker push ghcr.io/octohuman/unbound-386:latest
-          docker push ghcr.io/octohuman/unbound-amd64:latest
+          docker push ghcr.io/octohuman/unbound:386
+          docker push ghcr.io/octohuman/unbound:amd64
 
       - name: Create manifest
-        run: docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound-amd64:latest ghcr.io/octohuman/unbound-386:latest
+        run: |
+          docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound:amd64 ghcr.io/octohuman/unbound:386
+          docker manifest push ghcr.io/octohuman/unbound:latest
 
       - name: List manifest
         run: docker manifest inspect --verbose ghcr.io/octohuman/unbound:latest
