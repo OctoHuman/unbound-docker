@@ -52,4 +52,5 @@ jobs:
         run: docker manifest inspect --verbose ghcr.io/octohuman/unbound:latest
 
       - name: Log out of registry
+        if: ${{ always() }}
         run: docker logout ghcr.io
