@@ -46,7 +46,7 @@ jobs:
           docker push ghcr.io/octohuman/unbound-amd64:latest
 
       - name: Create manifest
-        run: docker create manifest ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound-amd64:latest ghcr.io/octohuman/unbound-386:latest
+        run: docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound-amd64:latest ghcr.io/octohuman/unbound-386:latest
 
       - name: List manifest
         run: docker manifest inspect --verbose ghcr.io/octohuman/unbound:latest
