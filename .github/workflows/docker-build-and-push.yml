@@ -35,7 +35,7 @@ jobs:
         run: docker build . --tag ghcr.io/octohuman/unbound-386:latest --no-cache --platform=linux/386
 
       - name: Build AMD64 image
-        run: docker build . --tag ghcr.io/octohuman/unbound-amd64:latest --no-cache --platform=linux/amd64
+        run: docker build . --tag ghcr.io/octohuman/unbound-amd64:latest --no-cache
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u OctoHuman --password-stdin
