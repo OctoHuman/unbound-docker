@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Validate input
-        if: ${{ (inputs.build_arch != 'linux/arm/v8') && (inputs.build_arch != "linux/amd64") }}
+        if: ${{ (inputs.build_arch != 'linux/arm/v8') && (inputs.build_arch != 'linux/amd64') }}
         run: exit 1;
 
       - uses: actions/checkout@v3
