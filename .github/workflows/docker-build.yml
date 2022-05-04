@@ -8,10 +8,7 @@ on:
       build_arch:
         description: "Target platform to build for."
         required: true
-        type: choice
-        options:
-        - linux/amd64
-        - linux/arm/v8
+        type: string
 
 jobs:
   build-and-push:
