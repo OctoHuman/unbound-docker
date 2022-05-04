@@ -1,0 +1,53 @@
+name: Docker Build and Push
+
+permissions: {}
+
+on:
+  schedule:
+    # At 5:30am on the 2nd, 15th, and 29th of every month
+    - cron: '30 5 2,15,29 * *'
+
+  # Allows manual workflow runs through github.com
+  workflow_dispatch:
+
+jobs:
+  build-amd64:
+    name: Build for AMD64
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      build-arch: linux/amd64
+    permissions:
+      contents: read
+      packages: write
+    
+  build-armv8:
+    name: Build for ARMv8
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      build-arch: linux/arm/v8
+    permissions:
+      contents: read
+      packages: write
+
+  push-manifest:
+    needs: [build-amd64, build-armv8]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u OctoHuman --password-stdin
+
+      - name: Create manifest
+        run: |
+          docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound:amd64 ghcr.io/octohuman/unbound:armv8
+          docker manifest push ghcr.io/octohuman/unbound:latest
+
+      - name: List manifest
+        run: docker manifest inspect --verbose ghcr.io/octohuman/unbound:latest
+
+      - name: Log out of registry
+        if: ${{ always() }}
+        run: docker logout ghcr.io
