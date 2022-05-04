@@ -13,7 +13,7 @@ on:
 jobs:
   build-amd64:
     name: Build for AMD64
-    uses: ./.github/workflow/docker-build.yml
+    uses: ./.github/workflows/docker-build.yml
     with:
       build-arch: linux/amd64
     permissions:
@@ -22,7 +22,7 @@ jobs:
     
   build-armv8:
     name: Build for ARMv8
-    uses: ./.github/workflow/docker-build.yml
+    uses: ./.github/workflows/docker-build.yml
     with:
       build-arch: linux/arm/v8
     permissions:
