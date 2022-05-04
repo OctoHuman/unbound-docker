@@ -1,0 +1,58 @@
+name: Build Docker image
+
+permissions: {}
+
+on:
+  workflow_call:
+    inputs:
+      build_arch:
+        description: "Target platform to build for."
+        required: true
+        type: choice
+        options:
+        - linux/amd64
+        - linux/arm/v8
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Validate input
+        if: ${{ (input.build_arch != 'linux/arm/v8') && (input.build_arch != "linux/amd64") }}
+        run: exit 1;
+
+      - uses: actions/checkout@v3
+
+      # Required to cross-compile
+      - name: Set up QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install qemu-user-static binfmt-support -y
+
+      - name: List available build platforms
+        run: docker buildx ls
+
+
+      - name: Build image ARMv8
+        if: ${{ inputs.build_arch == 'linux/arm/v8' }}
+        run: docker build . --tag ghcr.io/octohuman/unbound:armv8 --no-cache --platform=linux/arm/v8
+      
+      - name: Build image AMD64
+        if: ${{ inputs.build_arch == 'linux/amd64' }}
+        run: docker build . --tag ghcr.io/octohuman/unbound:amd64 --no-cache --platform=linux/amd64
+
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u OctoHuman --password-stdin
+
+      - name: Push images
+        run: docker push ghcr.io/octohuman/unbound --all-tags
+
+      - name: Log out of registry
+        if: ${{ always() }}
+        run: docker logout ghcr.io
