@@ -11,26 +11,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-amd64:
+  build_amd64:
     name: Build for AMD64
     uses: ./.github/workflows/docker-build.yml
     with:
-      build-arch: linux/amd64
+      build_arch: linux/amd64
     permissions:
       contents: read
       packages: write
     
-  build-armv8:
-    name: Build for ARMv8
+  build_arm64:
+    name: Build for ARM64
     uses: ./.github/workflows/docker-build.yml
     with:
-      build-arch: linux/arm/v8
+      build_arch: linux/arm64
     permissions:
       contents: read
       packages: write
 
   push-manifest:
-    needs: [build-amd64, build-armv8]
+    needs: [build_amd64, build_arm64]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -42,7 +42,7 @@ jobs:
 
       - name: Create manifest
         run: |
-          docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound:amd64 ghcr.io/octohuman/unbound:armv8
+          docker manifest create ghcr.io/octohuman/unbound:latest ghcr.io/octohuman/unbound:amd64 ghcr.io/octohuman/unbound:arm64
           docker manifest push ghcr.io/octohuman/unbound:latest
 
       - name: List manifest

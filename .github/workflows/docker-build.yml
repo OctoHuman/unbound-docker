@@ -8,10 +8,7 @@ on:
       build_arch:
         description: "Target platform to build for."
         required: true
-        type: choice
-        options:
-        - linux/amd64
-        - linux/arm/v8
+        type: string
 
 jobs:
   build-and-push:
@@ -23,7 +20,7 @@ jobs:
 
     steps:
       - name: Validate input
-        if: ${{ (input.build_arch != 'linux/arm/v8') && (input.build_arch != "linux/amd64") }}
+        if: ${{ (inputs.build_arch != 'linux/arm64') && (inputs.build_arch != 'linux/amd64') }}
         run: exit 1;
 
       - uses: actions/checkout@v3
@@ -38,9 +35,9 @@ jobs:
         run: docker buildx ls
 
 
-      - name: Build image ARMv8
-        if: ${{ inputs.build_arch == 'linux/arm/v8' }}
-        run: docker build . --tag ghcr.io/octohuman/unbound:armv8 --no-cache --platform=linux/arm/v8
+      - name: Build image ARM64
+        if: ${{ inputs.build_arch == 'linux/arm64' }}
+        run: docker build . --tag ghcr.io/octohuman/unbound:arm64 --no-cache --platform=linux/arm64
       
       - name: Build image AMD64
         if: ${{ inputs.build_arch == 'linux/amd64' }}
