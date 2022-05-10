@@ -1,4 +1,4 @@
-FROM debian:bullseye as unbound-build
+FROM ubuntu:jammy as unbound-build
 
 WORKDIR /opt/unbound/
 
@@ -39,25 +39,31 @@ RUN DEB_BUILD_MAINT_OPTIONS="hardening=+all" \
 
 RUN ["make", "install"]
 
-RUN ["rm", "-rf", "/opt/unbound/include", "/opt/unbound/lib", "/opt/unbound/share", "/opt/unbound/unbound-1.15.0"]
+RUN ["rm", "-rf", "/opt/unbound/include", "/opt/unbound/lib", "/opt/unbound/share", "/opt/unbound/unbound-1.15.0", "/opt/unbound/etc/unbound/unbound.conf"]
 
-FROM debian:bullseye as unbound
+FROM ubuntu:jammy as unbound
 
 COPY --from=unbound-build /opt/unbound/ /opt/unbound/
+ADD --chown=root:root bootstrap.sh /usr/local/sbin/bootstrap.sh
 
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install ca-certificates openssl -y && \
+    apt-get install ca-certificates openssl bind9-host -y && \
+    chmod +x /usr/local/sbin/bootstrap.sh && \
     mkdir /opt/unbound/dev/ && \
     mknod -m 0666 /opt/unbound/dev/random c 1 8 && \
     mknod -m 0666 /opt/unbound/dev/urandom c 1 9 && \
     mknod -m 0666 /opt/unbound/dev/zero c 1 5 && \
     adduser unbound --system --shell /usr/sbin/nologin --no-create-home --disabled-login && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*debian.org*
-
-#ADD unbound.conf /opt/unbound/etc/unbound/unbound.conf
+    rm -rf /var/lib/apt/lists/*ubuntu.com*
 
 ENV PATH=/opt/unbound/sbin:"$PATH"
 
-CMD ["unbound", "-d", "-vvvvvv"]
+ENTRYPOINT ["bootstrap.sh"]
+
+EXPOSE 5353/udp
+EXPOSE 5353/tcp
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD host -t A -p 5353 -W 5 google.com 127.0.0.1 || exit 1
