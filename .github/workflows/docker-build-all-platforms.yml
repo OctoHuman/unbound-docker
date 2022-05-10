@@ -4,8 +4,8 @@ permissions: {}
 
 on:
   schedule:
-    # At 5:30am on the 2nd, 15th, and 29th of every month
-    - cron: '30 5 2,15,29 * *'
+    # At 1:30pm on the 2nd, 9th, 16th, and 23th of every month
+    - cron: '30 13 2,9,16,23 * *'
 
   # Allows manual workflow runs through github.com
   workflow_dispatch:
